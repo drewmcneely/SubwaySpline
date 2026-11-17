@@ -8,6 +8,9 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ScaleGestureDetector
+import android.graphics.PointF
+import android.graphics.Paint
+import android.graphics.Color
 
 class DiagramView(context: Context, private val bitmap: Bitmap) : View(context) {
     private val imageToScreen = Matrix()
@@ -38,10 +41,19 @@ class DiagramView(context: Context, private val bitmap: Bitmap) : View(context) 
         return true
     }
 
-
+    var dot: PointF? = null
+        set(value) { field = value; invalidate() }
+    private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(30, 120, 255) }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawBitmap(bitmap, imageToScreen, null)
+        dot?.let {
+            val p = floatArrayOf(it.x, it.y)
+            imageToScreen.mapPoints(p)          // image px → screen px, i.e. M(p)
+            canvas.drawCircle(p[0], p[1], 20f, dotPaint)
+        }
     }
+
+
 }
